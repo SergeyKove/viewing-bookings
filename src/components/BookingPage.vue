@@ -4,7 +4,10 @@
   </button>
   <div class="flex-row">
     <div v-for="item in filtredTables" class="flex-column position-relative">
-      <div class="flex-column header-cell">
+      <div
+        class="flex-column header-cell"
+        :style="{ width: `${widthCell}px`, height: `${heightHeaderCell}px` }"
+      >
         <span> #{{ item.number }} {{ item.capacity + ' чел' }}</span>
 
         <span>{{ item.zone }}</span>
@@ -103,6 +106,7 @@ const filtredTables = computed(() => {
 
 const widthCell = ref(80)
 const heightCell = ref(40)
+const heightHeaderCell = ref(48)
 
 const pixelMinute = computed(() => {
   return heightCell.value / 30
@@ -114,7 +118,7 @@ function getPos(start_time, end_time) {
   const top = moment(start_time).diff(startAddDateTime, 'minutes')
   const height = moment(end_time).diff(moment(start_time), 'minutes')
   return {
-    top: `${(top * pixelMinute.value + 48).toFixed()}px`, // 48 - высота верхней клетки
+    top: `${(top * pixelMinute.value + heightHeaderCell.value).toFixed()}px`,
     height: `${(height * pixelMinute.value).toFixed()}px`,
   }
 }
@@ -122,11 +126,13 @@ function getPos(start_time, end_time) {
 function increaseSize() {
   widthCell.value += 16
   heightCell.value += 4
+  heightHeaderCell.value += 4
 }
 
 function reduceSize() {
   widthCell.value -= 16
   heightCell.value -= 4
+  heightHeaderCell.value -= 4
 }
 </script>
 
@@ -142,8 +148,6 @@ function reduceSize() {
 }
 
 .header-cell {
-  width: 80px;
-  height: 48px;
   font-weight: 400;
   font-size: 11px;
   text-align: center;
