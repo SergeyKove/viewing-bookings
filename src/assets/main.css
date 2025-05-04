@@ -1,10 +1,25 @@
 @import './base.css';
+@import './header.css';
+@import './body.css';
+@import './table.css';
+@import 'inter-ui/inter.css';
+
+html,
+body,
+header {
+  font-family: 'Inter', 'system-ui';
+}
+
+@supports (font-variation-settings: normal) {
+  html {
+    font-family: 'InterVariable', 'system-ui';
+  }
+}
 
 #app {
   max-width: 1280px;
-  /* margin: 0 auto; */
+  margin: 0 auto;
   padding: 2rem;
-  font-weight: normal;
 }
 
 a,
@@ -16,5 +31,15 @@ a,
 }
 
 body {
-  background-color: rgba(231, 224, 224, 0.801);
+  background-color: rgba(27, 27, 29, 1);
+  color: rgba(255, 255, 255, 1);
+}
+
+.text-grey {
+  color: rgba(255, 255, 255, 0.64);
+}
+
+button,
+input {
+  all: unset;
 }

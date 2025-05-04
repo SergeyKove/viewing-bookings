@@ -1,0 +1,90 @@
+.table {
+  width: 1240px;
+  overflow-y: scroll;
+  margin-top: 33px;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-cell {
+  font-weight: 400;
+  font-size: 11px;
+  text-align: center;
+}
+
+.border {
+  border-right: 1px solid black;
+  border-top: 1px solid black;
+}
+
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+.block-order {
+  width: 80px;
+  background-color: rgba(128, 128, 128, 0.9);
+  border: 1px solid red;
+}
+
+.block-order:hover {
+  z-index: 9999;
+}
+
+.block-reservation {
+  width: 80px;
+  background-color: rgba(179, 176, 176, 0.9);
+  border: 1px solid rgb(30, 255, 0);
+}
+
+.block-reservation:hover {
+  z-index: 9999;
+}
+
+.btn-size-table {
+  position: fixed;
+  right: 350px;
+  bottom: 40px;
+  background-color: rgba(34, 34, 34, 1);
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+}
+
+.btn-size-table div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-size-table span {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 16px;
+  letter-spacing: 0px;
+}
+
+.btn-size-table button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+.btn-size-table button:hover {
+  background-color: blue;
+}

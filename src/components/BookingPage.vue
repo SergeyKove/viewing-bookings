@@ -1,15 +1,13 @@
 <template>
-  <button v-for="item in restaurantData.available_days" @click="correntDate = item" class="btn">
-    {{ item }}
-  </button>
-  <div class="flex-row">
+  <BookingHeader :restaurant="restaurantData.restaurant" />
+  <BookingBody :restaurantData="restaurantData" v-model="correntDate" />
+  <div class="flex-row table">
     <div v-for="item in filtredTables" class="flex-column position-relative">
       <div
         class="flex-column header-cell"
         :style="{ width: `${widthCell}px`, height: `${heightHeaderCell}px` }"
       >
         <span> #{{ item.number }} {{ item.capacity + ' чел' }}</span>
-
         <span>{{ item.zone }}</span>
       </div>
       <div
@@ -19,14 +17,22 @@
       ></div>
       <div
         v-for="itm in item.orders"
-        :style="{ top: itm.pos.top, height: itm.pos.height }"
+        :style="{
+          top: `${itm.pos.top}px`,
+          height: `${itm.pos.height}px`,
+          marginLeft: `${itm.pos.marginLeft}px`,
+        }"
         class="position-absolute block-order"
       >
         {{ itm.status }}
       </div>
       <div
         v-for="itm in item.reservations"
-        :style="{ top: itm.pos.top, height: itm.pos.height }"
+        :style="{
+          top: `${itm.pos.top}px`,
+          height: `${itm.pos.height}px`,
+          marginLeft: `${itm.pos.marginLeft}px`,
+        }"
         class="position-absolute block-reservation"
       >
         {{ itm.status }}
@@ -34,17 +40,22 @@
     </div>
   </div>
   <div class="btn-size-table">
-    Масштаб
-    <button @click="increaseSize()">+</button>
-    <button @click="reduceSize()">-</button>
+    <span>Масштаб</span>
+    <div>
+      <button @click="increaseSize()">+</button>
+      <button @click="reduceSize()">-</button>
+    </div>
   </div>
 </template>
 
 <script setup>
+import BookingHeader from './BookingHeader.vue'
+import BookingBody from './BookingBody.vue'
 import { computed, ref } from 'vue'
 import moment from 'moment-timezone'
 import axios from 'axios'
 
+moment.locale('ru')
 moment.tz.setDefault('Asia/Vladivostok')
 
 const restaurantData = ref([])
@@ -118,8 +129,8 @@ function getPos(start_time, end_time) {
   const top = moment(start_time).diff(startAddDateTime, 'minutes')
   const height = moment(end_time).diff(moment(start_time), 'minutes')
   return {
-    top: `${(top * pixelMinute.value + heightHeaderCell.value).toFixed()}px`,
-    height: `${(height * pixelMinute.value).toFixed()}px`,
+    top: (top * pixelMinute.value + heightHeaderCell.value).toFixed(),
+    height: (height * pixelMinute.value).toFixed(),
   }
 }
 
@@ -134,65 +145,30 @@ function reduceSize() {
   heightCell.value -= 4
   heightHeaderCell.value -= 4
 }
+
+// function adjustMargins(elements) {
+//   for (let i = 0; i < elements.length; i++) {
+//     const current = elements[i].pos
+//     for (let j = 1; j < elements.length; j++) {
+//       const next = elements[j].pos
+
+//       if (current.top < next.top + next.height && current.top + current.height > next.top) {
+//         next.marginLeft = parseInt(next.marginLeft || 0) + 4
+//       }
+//     }
+//   }
+//   return elements
+// }
+
+// const addingMargin = computed(() => {
+//   return filtredTables.value?.map((table) => {
+//     return {
+//       ...table,
+//       orders: adjustMargins(table.orders),
+//       reservations: adjustMargins(table.reservations),
+//     }
+//   })
+// })
 </script>
 
-<style scoped>
-.flex-row {
-  display: flex;
-  flex-direction: row;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.header-cell {
-  font-weight: 400;
-  font-size: 11px;
-  text-align: center;
-}
-
-.border {
-  border-right: 1px solid black;
-  border-top: 1px solid black;
-}
-
-.btn {
-  width: 66px;
-  height: 36px;
-  min-height: 36px;
-  border-radius: 8px;
-  padding: 4px 8px;
-  margin-right: 8px;
-}
-
-.position-relative {
-  position: relative;
-}
-
-.position-absolute {
-  position: absolute;
-}
-
-.block-order {
-  width: 80px;
-  background-color: gray;
-  border: 1px solid red;
-}
-
-.block-reservation {
-  width: 80px;
-  background-color: rgb(179, 176, 176);
-  border: 1px solid rgb(30, 255, 0);
-}
-
-.btn-size-table {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  background-color: yellow;
-  padding: 5px;
-  border-radius: 8px;
-}
-</style>
+<style></style>
