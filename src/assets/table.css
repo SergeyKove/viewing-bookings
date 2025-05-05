@@ -33,26 +33,6 @@
   position: absolute;
 }
 
-.block-order {
-  width: 80px;
-  background-color: rgba(128, 128, 128, 0.9);
-  border: 1px solid red;
-}
-
-.block-order:hover {
-  z-index: 9999;
-}
-
-.block-reservation {
-  width: 80px;
-  background-color: rgba(179, 176, 176, 0.9);
-  border: 1px solid rgb(30, 255, 0);
-}
-
-.block-reservation:hover {
-  z-index: 9999;
-}
-
 .btn-size-table {
   position: fixed;
   right: 350px;
@@ -61,6 +41,7 @@
   padding: 8px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 8px;
+  z-index: 1001;
 }
 
 .btn-size-table div {

@@ -1,44 +1,24 @@
 <template>
   <BookingHeader :restaurant="restaurantData.restaurant" />
-  <BookingBody :restaurantData="restaurantData" v-model="correntDate" />
+
+  <BookingBody
+    :restaurantData="restaurantData"
+    v-model="currentDate"
+    v-model:zone="tableZoneModel"
+    :tableZones="tableZones"
+  />
+
   <div class="flex-row table">
-    <div v-for="item in filtredTables" class="flex-column position-relative">
-      <div
-        class="flex-column header-cell"
-        :style="{ width: `${widthCell}px`, height: `${heightHeaderCell}px` }"
-      >
-        <span> #{{ item.number }} {{ item.capacity + ' чел' }}</span>
-        <span>{{ item.zone }}</span>
-      </div>
-      <div
-        v-for="item in workTime"
-        class="border"
-        :style="{ width: `${widthCell}px`, height: `${heightCell}px` }"
-      ></div>
-      <div
-        v-for="itm in item.orders"
-        :style="{
-          top: `${itm.pos.top}px`,
-          height: `${itm.pos.height}px`,
-          marginLeft: `${itm.pos.marginLeft}px`,
-        }"
-        class="position-absolute block-order"
-      >
-        {{ itm.status }}
-      </div>
-      <div
-        v-for="itm in item.reservations"
-        :style="{
-          top: `${itm.pos.top}px`,
-          height: `${itm.pos.height}px`,
-          marginLeft: `${itm.pos.marginLeft}px`,
-        }"
-        class="position-absolute block-reservation"
-      >
-        {{ itm.status }}
-      </div>
-    </div>
+    <template v-for="item in filtredTables">
+      <TableColumn
+        :item="item"
+        :cellParams="cellParams"
+        :workTime="workTime"
+        :openingTime="openingTime"
+      />
+    </template>
   </div>
+
   <div class="btn-size-table">
     <span>Масштаб</span>
     <div>
@@ -51,6 +31,8 @@
 <script setup>
 import BookingHeader from './BookingHeader.vue'
 import BookingBody from './BookingBody.vue'
+import TableColumn from '@/components/bookingTable/TableColumn.vue'
+
 import { computed, ref } from 'vue'
 import moment from 'moment-timezone'
 import axios from 'axios'
@@ -58,25 +40,39 @@ import axios from 'axios'
 moment.locale('ru')
 moment.tz.setDefault('Asia/Vladivostok')
 
+const RESERVATION_TYPE = {
+  ORDER: 'ORDER',
+  RESERVATION: 'RESERVATION',
+}
+
 const restaurantData = ref([])
-const correntDate = ref('')
+const currentDate = ref('')
+const openingTime = computed(() => restaurantData.value.restaurant.opening_time)
+const workTime = ref([])
 
 async function getRestaurant() {
   const data = await axios.get('https://hh.frontend.ark.software/api/booking')
+
   restaurantData.value = data.data
-  correntDate.value = data.data.current_day
+  currentDate.value = data.data.current_day
+
+  workTime.value = timeWorkRestaurant(
+    data.data.restaurant.opening_time,
+    data.data.restaurant.closing_time,
+  )
 }
 getRestaurant()
 
-const timeWorkRestaurant = function () {
+const timeWorkRestaurant = (opening_time, closing_time) => {
   const time_object = []
-  // const [hoursOpen, minutesOpen] = items.value.restaurant.opening_time.split(':')
-  // const [hoursClose, minutesClose] = items.value.restaurant.closing_time.split(':')
 
-  let hour = 11
-  let minute = 0
-  let end_hour = 23
-  let end_minute = 40
+  const start = opening_time.split(':')
+  const end = closing_time.split(':')
+
+  let hour = Number(start[0])
+  let minute = Number(start[1])
+  let end_hour = Number(end[0])
+  let end_minute = Number(end[1])
 
   while (hour < end_hour || (hour == end_hour && minute <= end_minute)) {
     time_object.push({ hour, minute })
@@ -89,50 +85,60 @@ const timeWorkRestaurant = function () {
 
   return time_object
 }
-const workTime = timeWorkRestaurant()
-
-const filtredTables = computed(() => {
-  return restaurantData.value.tables?.map((table) => {
-    return {
-      ...table,
-      orders: table.orders
-        .filter((item) => moment(item.start_time).isSame(correntDate.value, 'day') === true)
-        .map((order) => {
-          return {
-            ...order,
-            pos: getPos(order.start_time, order.end_time),
-          }
-        }),
-      reservations: table.reservations
-        .filter((item) => moment(item.seating_time).isSame(correntDate.value, 'day') === true)
-        .map((reservation) => {
-          return {
-            ...reservation,
-            pos: getPos(reservation.seating_time, reservation.end_time),
-          }
-        }),
-    }
-  })
-})
 
 const widthCell = ref(80)
 const heightCell = ref(40)
 const heightHeaderCell = ref(48)
 
-const pixelMinute = computed(() => {
-  return heightCell.value / 30
+const cellParams = computed(() => ({
+  widthCell: widthCell.value,
+  heightCell: heightCell.value,
+  heightHeaderCell: heightHeaderCell.value,
+}))
+
+const normalizeStartTimeTables = computed(() => {
+  if (restaurantData.value && restaurantData.value.tables) {
+    return {
+      ...restaurantData.value,
+      tables: restaurantData.value.tables.map((item) => {
+        const orders = item.orders.map((order) => ({
+          ...order,
+          type: RESERVATION_TYPE.ORDER,
+        }))
+
+        const reservations = item.reservations.map((reservation) => ({
+          ...reservation,
+          type: RESERVATION_TYPE.RESERVATION,
+          start_time: reservation.seating_time,
+        }))
+
+        return {
+          ...item,
+          normalized: [...orders, ...reservations],
+        }
+      }),
+    }
+  }
+
+  return []
 })
 
-function getPos(start_time, end_time) {
-  const [hoursOpen, minutesOpen] = restaurantData.value.restaurant.opening_time.split(':')
-  const startAddDateTime = moment(start_time).hour(hoursOpen).minute(minutesOpen)
-  const top = moment(start_time).diff(startAddDateTime, 'minutes')
-  const height = moment(end_time).diff(moment(start_time), 'minutes')
-  return {
-    top: (top * pixelMinute.value + heightHeaderCell.value).toFixed(),
-    height: (height * pixelMinute.value).toFixed(),
-  }
-}
+const filtredTables = computed(() => {
+  const tables = normalizeStartTimeTables.value.tables
+    ? tableZoneModel.value
+      ? normalizeStartTimeTables.value.tables.filter((item) => item.zone === tableZoneModel.value)
+      : normalizeStartTimeTables.value.tables
+    : []
+
+  return tables.map((table) => {
+    return {
+      ...table,
+      normalized: table.normalized.filter((item) => {
+        return moment(item.start_time).isSame(currentDate.value, 'day') === true
+      }),
+    }
+  })
+})
 
 function increaseSize() {
   widthCell.value += 16
@@ -146,29 +152,19 @@ function reduceSize() {
   heightHeaderCell.value -= 4
 }
 
-// function adjustMargins(elements) {
-//   for (let i = 0; i < elements.length; i++) {
-//     const current = elements[i].pos
-//     for (let j = 1; j < elements.length; j++) {
-//       const next = elements[j].pos
+const tableZones = computed(() => {
+  if (normalizeStartTimeTables.value && normalizeStartTimeTables.value.tables) {
+    let items = {}
+    normalizeStartTimeTables.value.tables.forEach((table) => {
+      if (table.zone && !(table.zone in items)) items[table.zone] = table.zone
+    })
+    return Object.keys(items)
+  }
 
-//       if (current.top < next.top + next.height && current.top + current.height > next.top) {
-//         next.marginLeft = parseInt(next.marginLeft || 0) + 4
-//       }
-//     }
-//   }
-//   return elements
-// }
+  return []
+})
 
-// const addingMargin = computed(() => {
-//   return filtredTables.value?.map((table) => {
-//     return {
-//       ...table,
-//       orders: adjustMargins(table.orders),
-//       reservations: adjustMargins(table.reservations),
-//     }
-//   })
-// })
+const tableZoneModel = ref(undefined)
 </script>
 
 <style></style>
