@@ -101,7 +101,8 @@ function getPos(start_time, end_time) {
 <style scoped>
 .block-reservation:hover {
   z-index: 1000;
-  background-color: rgba(0, 0, 0, 0.705) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(2px);
   overflow: visible;
 }
 </style>

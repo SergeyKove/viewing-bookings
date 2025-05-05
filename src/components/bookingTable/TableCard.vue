@@ -6,7 +6,7 @@
     >
     <span v-if="item.type === 'ORDER' && item.status !== 'Banquet'">Заказ</span>
     <span v-if="item.type === 'ORDER' && item.status === 'Banquet'">Банкет</span>
-    <OrderBadje :item="item" />
+    <OrderBadje v-if="item.status !== 'Banquet'" :item="item" />
     <span v-if="item.phone_number" style="font-size: 8px"
       ><PhoneIcon />{{ item.phone_number }}</span
     >

@@ -1,6 +1,21 @@
 <template>
-  <div v-if="item.status !== 'Banquet'" class="badje neutral">
-    {{ item.status }}
+  <div
+    class="badje"
+    :class="{
+      neutral: item.status === 'New' || 'Closed' || 'Живая очередь' || 'Отменен',
+      success: item.status === 'Bill',
+      primary: item.status === 'Новая',
+      'primary-reverse': item.status === 'Заявка',
+    }"
+  >
+    <span v-if="item.status === 'New'"> Новый </span>
+    <span v-if="item.status === 'Bill'"> Пречек </span>
+    <span v-if="item.status === 'Closed'"> Закрытый </span>
+    <span v-if="item.status === 'Живая очередь'"> Живая очередь </span>
+    <span v-if="item.status === 'Новая'"> Ожидает подтверждения </span>
+    <span v-if="item.status === 'Заявка'"> Ожидаем </span>
+    <span v-if="item.status === 'Открыт'"> В зале </span>
+    <span v-if="item.status === 'Отменен'"> Отменен </span>
   </div>
 </template>
 
