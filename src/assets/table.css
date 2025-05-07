@@ -1,7 +1,22 @@
 .table {
   width: 1240px;
-  overflow-y: scroll;
+  overflow-x: auto;
   margin-top: 33px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.table::-webkit-scrollbar {
+  background: none;
+}
+
+.table::-webkit-scrollbar-thumb {
+  background: rgba(114, 114, 114, 0.5);
+  border-radius: 20px;
+}
+
+.table::-webkit-scrollbar-corner {
+  background-color: transparent;
 }
 
 .flex-row {
@@ -18,11 +33,13 @@
   font-weight: 400;
   font-size: 11px;
   text-align: center;
+  position: sticky;
+  top: 0;
 }
 
 .border {
-  border-right: 1px solid black;
-  border-top: 1px solid black;
+  border-right: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .position-relative {
@@ -31,41 +48,4 @@
 
 .position-absolute {
   position: absolute;
-}
-
-.btn-size-table {
-  position: fixed;
-  right: 350px;
-  bottom: 40px;
-  background-color: rgba(34, 34, 34, 1);
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  z-index: 1001;
-}
-
-.btn-size-table div {
-  display: flex;
-  justify-content: space-between;
-}
-
-.btn-size-table span {
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 16px;
-  letter-spacing: 0px;
-}
-
-.btn-size-table button {
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-}
-
-.btn-size-table button:hover {
-  background-color: blue;
 }

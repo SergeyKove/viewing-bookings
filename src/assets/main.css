@@ -2,7 +2,7 @@
 @import './header.css';
 @import './body.css';
 @import './table.css';
-@import 'inter-ui/inter.css';
+@import './font.css';
 
 html,
 body,
@@ -22,14 +22,6 @@ header {
   padding: 2rem;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
 body {
   background-color: rgba(27, 27, 29, 1);
   color: rgba(255, 255, 255, 1);
@@ -42,4 +34,12 @@ body {
 button,
 input {
   all: unset;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.small-text {
+  font-size: 8px;
 }

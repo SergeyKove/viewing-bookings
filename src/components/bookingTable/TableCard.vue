@@ -1,28 +1,33 @@
 <template>
-  <div class="card" :style="getBackground">
-    <span v-if="item.name_for_reservation" style="font-size: 8px">№{{ item.id }}</span>
+  <div class="card" :style="getCardStyle">
+    <span v-if="item.name_for_reservation" class="small-text">№{{ item.id }}</span>
+
     <span v-if="item.name_for_reservation"
       >{{ item.name_for_reservation }};{{ item.num_people }}чел</span
     >
-    <span v-if="item.type === 'ORDER' && item.status !== 'Banquet'">Заказ</span>
-    <span v-if="item.type === 'ORDER' && item.status === 'Banquet'">Банкет</span>
-    <OrderBadje v-if="item.status !== 'Banquet'" :item="item" />
-    <span v-if="item.phone_number" style="font-size: 8px"
-      ><PhoneIcon />{{ item.phone_number }}</span
-    >
+
+    <span v-if="item.type === RESERVATION_TYPE.ORDER">{{
+      item.status === 'Banquet' ? 'Банкет' : 'Заказ'
+    }}</span>
+
+    <OrderBadge v-if="item.status !== 'Banquet'" :item="item" />
+
+    <span v-if="item.phone_number" class="phone-icon"><PhoneIcon />{{ item.phone_number }}</span>
+
     <span
-      >{{ moment(item.start_time).format('HH:mm') }}-{{
-        moment(item.end_time).format('HH:mm')
-      }}</span
+      >{{ moment(item.start_time).format('HH:mm') }} -
+      {{ moment(item.end_time).format('HH:mm') }}</span
     >
   </div>
 </template>
 
 <script setup>
-import OrderBadje from '@/ui/badje/OrderBadje.vue'
+import OrderBadge from '@/ui/badge/OrderBadge.vue'
 import PhoneIcon from '@/ui/icon/PhoneIcon.vue'
-import { computed, ref } from 'vue'
+
+import { computed } from 'vue'
 import moment from 'moment-timezone'
+import { RESERVATION_TYPE } from '@/app-variables.js'
 
 const props = defineProps({
   item: Object,
@@ -50,16 +55,33 @@ const getBackground = computed(() => {
       : undefined
 
   if (colors)
-    return `background: linear-gradient(to right, ${colors.main} 4px, ${colors.main} 4px, ${colors.sub} 4px, ${colors.sub} 100%);`
+    return `linear-gradient(to right, ${colors.main} 4px, ${colors.main} 4px, ${colors.sub} 4px, ${colors.sub} 100%)`
 
-  return 'background-color: rgba(128, 128, 128, 0.9);'
+  return 'rgba(128, 128, 128, 0.9)'
+})
+
+const getCardStyle = computed(() => {
+  if (!props.item || !props.item.status) return ''
+
+  const pos = props.item.pos
+  return {
+    background: getBackground.value,
+    top: `${pos.top}px`,
+    height: `${pos.height}px`,
+    marginLeft: typeof pos.marginLeft === 'number' ? `${pos.marginLeft}px` : pos.marginLeft,
+    width: pos.width
+      ? `${pos.width}%`
+      : pos.marginLeft
+        ? `calc(100% - ${pos.marginLeft}px)`
+        : '100%',
+  }
 })
 </script>
 
 <style scoped>
 .card {
   border-radius: 4px;
-  padding: 4px 10px;
+  padding: 4px 8px;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -69,5 +91,10 @@ const getBackground = computed(() => {
   line-height: 14px;
   letter-spacing: 0px;
   overflow: hidden;
+}
+
+.phone-icon {
+  font-size: 8px;
+  white-space: nowrap;
 }
 </style>

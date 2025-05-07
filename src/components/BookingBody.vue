@@ -10,10 +10,19 @@
           v-for="item in restaurantData.available_days"
           @click="() => onClick(item)"
           autofocus
-          class="btn-date-block__button"
+          class="btn-date-block__button cursor-pointer"
           :class="{ 'btn-date-block__button_active': item === model }"
         >
-          {{ moment(item).calendar() }}
+          <span class="flex-row">{{ moment(item).format('D MMMM') }}</span>
+          <span>
+            {{
+              moment(item).calendar({
+                sameDay: '[cегодня]',
+                nextDay: '[завтра]',
+                nextWeek: 'dddd',
+              })
+            }}
+          </span>
         </button>
       </div>
     </div>
@@ -23,7 +32,7 @@
 
       <div class="flex-row" style="align-items: center">
         <button
-          class="btn-date-block__button"
+          class="btn-date-block__button cursor-pointer"
           :class="{ 'btn-date-block__button_active': zoneModel === undefined }"
           @click="() => (zoneModel = undefined)"
         >
@@ -32,7 +41,7 @@
 
         <button
           v-for="zone in tableZones"
-          class="btn-date-block__button"
+          class="btn-date-block__button cursor-pointer"
           :class="{ 'btn-date-block__button_active': zone === zoneModel }"
           @click="() => (zoneModel = zone)"
         >
@@ -44,7 +53,8 @@
 </template>
 
 <script setup>
-import moment from 'moment-timezone'
+import moment from 'moment/min/moment-with-locales'
+moment.locale('ru')
 
 const props = defineProps(['restaurantData', 'tableZones'])
 
@@ -66,7 +76,6 @@ function onClick(item) {
 }
 
 .btn-date-block__button {
-  height: 36px;
   padding: 4px 8px;
   background-color: rgba(255, 255, 255, 0.04);
   border-radius: 8px;

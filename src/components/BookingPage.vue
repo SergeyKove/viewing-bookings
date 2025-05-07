@@ -9,6 +9,13 @@
   />
 
   <div class="flex-row table">
+    <TableCurrentTime
+      v-if="openingTime"
+      :cellParams="cellParams"
+      :openingTime="openingTime"
+      :columnCount="filtredTables.length"
+    />
+    <TableTime :cellParams="cellParams" :workTime="workTime" />
     <template v-for="item in filtredTables">
       <TableColumn
         :item="item"
@@ -19,35 +26,36 @@
     </template>
   </div>
 
-  <div class="btn-size-table">
-    <span>Масштаб</span>
-    <div>
-      <button @click="increaseSize()">+</button>
-      <button @click="reduceSize()">-</button>
-    </div>
-  </div>
+  <TableSizeButtons
+    v-model:width="widthCell"
+    v-model:height="heightCell"
+    v-model:heightHeader="heightHeaderCell"
+  />
 </template>
 
 <script setup>
 import BookingHeader from './BookingHeader.vue'
 import BookingBody from './BookingBody.vue'
 import TableColumn from '@/components/bookingTable/TableColumn.vue'
+import TableSizeButtons from '@/components/bookingTable/TableSizeButtons.vue'
+import TableTime from './bookingTable/TableTime.vue'
+import TableCurrentTime from './bookingTable/TableCurrentTime.vue'
 
 import { computed, ref } from 'vue'
 import moment from 'moment-timezone'
 import axios from 'axios'
 
-moment.locale('ru')
+import { CELL_WIDTH, CELL_HEIGHT, HEADER_CELL_HEIGHT, RESERVATION_TYPE } from '@/app-variables.js'
+
 moment.tz.setDefault('Asia/Vladivostok')
 
-const RESERVATION_TYPE = {
-  ORDER: 'ORDER',
-  RESERVATION: 'RESERVATION',
-}
+const widthCell = ref(CELL_WIDTH)
+const heightCell = ref(CELL_HEIGHT)
+const heightHeaderCell = ref(HEADER_CELL_HEIGHT)
 
 const restaurantData = ref([])
 const currentDate = ref('')
-const openingTime = computed(() => restaurantData.value.restaurant.opening_time)
+const openingTime = computed(() => restaurantData.value.restaurant?.opening_time)
 const workTime = ref([])
 
 async function getRestaurant() {
@@ -85,10 +93,6 @@ const timeWorkRestaurant = (opening_time, closing_time) => {
 
   return time_object
 }
-
-const widthCell = ref(80)
-const heightCell = ref(40)
-const heightHeaderCell = ref(48)
 
 const cellParams = computed(() => ({
   widthCell: widthCell.value,
@@ -140,18 +144,7 @@ const filtredTables = computed(() => {
   })
 })
 
-function increaseSize() {
-  widthCell.value += 16
-  heightCell.value += 4
-  heightHeaderCell.value += 4
-}
-
-function reduceSize() {
-  widthCell.value -= 16
-  heightCell.value -= 4
-  heightHeaderCell.value -= 4
-}
-
+const tableZoneModel = ref(undefined)
 const tableZones = computed(() => {
   if (normalizeStartTimeTables.value && normalizeStartTimeTables.value.tables) {
     let items = {}
@@ -163,8 +156,6 @@ const tableZones = computed(() => {
 
   return []
 })
-
-const tableZoneModel = ref(undefined)
 </script>
 
-<style></style>
+<style scoped></style>

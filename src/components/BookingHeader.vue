@@ -2,7 +2,7 @@
   <header class="header flex-row">
     <h1 class="header-title">AIRESTO | {{ restaurant?.restaurant_name }}</h1>
 
-    <div class="flex-row" style="align-items: center; gap: 8px">
+    <div class="flex-row upper-left-block">
       <div class="search">
         <SearchIcon class="search-icon" />
         <input type="text" placeholder="⌘+Л поиск по имени" class="search-field" />
@@ -28,4 +28,4 @@ import SearchIcon from '@/ui/icon/SearchIcon.vue'
 const props = defineProps(['restaurant'])
 </script>
 
-<style></style>
+<style scoped></style>
